@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Map 0."""
+"""Map 0: Count documents in collection."""
 import sys
 
 
 def main():
-    key = 0
+    """Count number of HTML documents."""
     for line in sys.stdin:
         if "<!DOCTYPE html>" in line:
-            print(f"{key}\t1")
-            key += 1
+            # Emit 1 for each document found
+            print("key\t1")
+
 
 if __name__ == "__main__":
     main()

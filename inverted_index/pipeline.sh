@@ -1,17 +1,4 @@
 #!/bin/bash
-#
-# Example of how to chain MapReduce jobs together.  The output of one
-# job is the input to the next.
-#
-# Madoop options
-# -input <directory>                            # Input directory
-# -output <directory>                           # Output directory
-# -mapper <exec_name>                           # Mapper executable
-# -reducer <exec_name>                          # Reducer executable
-# -partitioner <exec_name>                      # Optional: Partitioner executable
-
-# Stop on errors
-# See https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 set -Eeuo pipefail
 
 # Optional input directory argument
@@ -25,8 +12,9 @@ set -x
 
 # Remove output directories
 rm -rf output output[0-9]
+rm -rf index_server/index/inverted_index
 
-# Job 0: Document Count (this job is not part of the pipeline)
+# Job 0: Document Count
 madoop \
   -input ${PIPELINE_INPUT} \
   -output output0 \
@@ -49,3 +37,24 @@ madoop \
   -output output2 \
   -mapper ./map2.py \
   -reducer ./reduce2.py
+
+# Job 3 (with partitioner)
+madoop \
+  -input output2 \
+  -output output3 \
+  -mapper ./map3.py \
+  -reducer ./reduce3.py \
+  -partitioner ./partition.py \
+  -numReduceTasks 3
+
+
+#idk if we need this bottom part mitul??? but we have it here lol
+# Create directory for index server files
+mkdir -p index_server/index/inverted_index
+
+# Copy output files to index server directory
+for i in {0..2}; do
+  if [ -f "output3/part-0000${i}" ]; then
+    cp "output3/part-0000${i}" "index_server/index/inverted_index/inverted_index_${i}.txt"
+  fi
+done

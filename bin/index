@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+#
+# Andrew DeOrio <awdeorio@umich.edu>
+
+LOG_FILE="var/log/index.log"
+FLASK_CMD="flask --app index run --host 0.0.0.0"
+PORTS=(9000 9001 9002)
+INDEX_PATHS=("inverted_index_0.txt" "inverted_index_1.txt" "inverted_index_2.txt")
+
+
+start() {
+    echo "starting index server ..."
+    mkdir -p var/log
+    rm -f "$LOG_FILE"
+    for i in "${!PORTS[@]}"; do
+        INDEX_PATH="${INDEX_PATHS[$i]}"
+        PORT="${PORTS[$i]}"
+        echo "+ INDEX_PATH=\"$INDEX_PATH\" $FLASK_CMD --port $PORT >> $LOG_FILE 2>&1 &"
+        INDEX_PATH="$INDEX_PATH" $FLASK_CMD --port $PORT >> "$LOG_FILE" 2>&1 &
+    done
+}
+
+stop() {
+    echo "stopping index server ..."
+    for PORT in "${PORTS[@]}"; do
+        echo "+ pkill -f \"$FLASK_CMD --port $PORT\" || true"
+        pkill -f "$FLASK_CMD --port $PORT" || true
+    done
+}
+
+restart() {
+    stop
+    start
+}
+
+
+status() {
+    set +o pipefail
+    NPROCS=$(pgrep -f "flask --app index run --host 0.0.0.0 --port 900[0-2]" | wc -l)
+    set -o pipefail
+    if [ "$NPROCS" -eq 3 ]; then
+    echo "index server running"
+    exit
+    elif [ "$NPROCS" -eq 0 ]; then
+    echo "index server stopped"
+    exit 1
+    else
+    echo "index server error: found ${NPROCS} processes, expected 3"
+    exit 2
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|status|restart}"
+        exit 1
+        ;;
+esac

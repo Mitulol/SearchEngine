@@ -6,6 +6,7 @@ import sys
 def main():
     """Stuff."""
     # Load stopwords
+    # TODO: whats this??
     with open("stopwords.txt", "r", encoding='utf-8') as f:
         stopwords = set(line.strip() for line in f)
 

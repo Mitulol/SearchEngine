@@ -3,6 +3,7 @@
 import sys
 import math
 
+# TODO: consider edge cases
 
 def main():
     """Do more stuff."""
@@ -11,12 +12,12 @@ def main():
 
     # Get total document count N
     with open("total_document_count.txt", "r", encoding='utf-8') as f:
-        n = int(f.read().strip())
+        n = int(f.read().strip()) # total number of documents
 
-    for line in sys.stdin:
+    for line in sys.stdin: # of the form term: doc_id tf ik OR tk: di tfik
         term, value = line.strip().split('\t')
         doc_id, tf = value.split()
-        tf = int(tf)
+        tf = int(tf) # term frequency in that document tf ik
 
         if current_term != term:
             if current_term is not None:

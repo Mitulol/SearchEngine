@@ -49,6 +49,7 @@ madoop \
 
 
 #idk if we need this bottom part mitul??? but we have it here lol
+# yes. Good job.
 # Create directory for index server files
 mkdir -p index_server/index/inverted_index
 

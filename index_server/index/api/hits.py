@@ -90,7 +90,13 @@ def get_hits():
             runningsum += position ** 2
         norm_factor = runningsum ** 0.5 # TODO: consider pulling norm_factor from INVERTED_INDEX. will need to add checks for equality for doc_id equality
         for term, position in value:
-            
+            value[term] = position/norm_factor
+    
+    #DONE
+    # docs is of the form:
+    # {doc_id: {tk: normalized_position}}
+
+    
     
 
 

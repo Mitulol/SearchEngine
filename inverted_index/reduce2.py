@@ -41,3 +41,56 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Code I wrote to be consistent with the reduce template from madoop.
+# This code is good, should work. I think. - Mitul
+
+# #!/usr/bin/env python3
+# """
+# Reduce 2: Calculate IDF and prepare document info.
+
+# https://github.com/eecs485staff/madoop/blob/main/README_Hadoop_Streaming.md
+# """
+# import sys
+# import math
+# import itertools
+
+
+# def reduce_one_group(term, group):
+#     """Reduce one group of lines with the same term."""
+#     # Get total document count N
+#     with open("total_document_count.txt", "r", encoding="utf-8") as f:
+#         n = int(f.read().strip())  # Total number of documents
+
+#     term_docs = []
+
+#     # Parse the lines in the group
+#     for line in group:
+#         _, value = line.strip().split("\t")
+#         doc_id, tf = value.split()
+#         tf = int(tf)  # Term frequency in that document
+#         term_docs.append((doc_id, tf))
+
+#     # Calculate IDF for the term
+#     n_k = len(term_docs)  # Number of docs containing term
+#     idf = math.log10(n / n_k)
+
+#     # Emit results for each document containing the term
+#     for doc, freq in sorted(term_docs):
+#         print(f"{doc}\t{term} {freq} {idf}")
+
+
+# def keyfunc(line):
+#     """Return the key from a TAB-delimited key-value pair."""
+#     return line.partition("\t")[0]
+
+
+# def main():
+#     """Divide sorted lines into groups that share a key."""
+#     for key, group in itertools.groupby(sys.stdin, keyfunc):
+#         reduce_one_group(key, group)
+
+
+# if __name__ == "__main__":
+#     main()

@@ -14,6 +14,9 @@ set -x
 rm -rf output output[0-9]
 rm -rf index_server/index/inverted_index
 
+# TODO: should we remove the output files before submitting the program?
+# They do that in the lab example.
+
 # Job 0: Document Count
 madoop \
   -input ${PIPELINE_INPUT} \
@@ -49,7 +52,7 @@ madoop \
 
 
 #idk if we need this bottom part mitul??? but we have it here lol
-# yes. Good job.
+# yes. Good job. -Mitul
 # Create directory for index server files
 mkdir -p index_server/index/inverted_index
 

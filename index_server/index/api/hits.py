@@ -83,29 +83,66 @@ def get_hits():
     # docs is of the form:
     # {doc_id: {tk: idf*tf_ik}}
 
-    # Accessing 1 doc
+    # # Accessing 1 doc
+    # for doc, value in docs.items():
+    #     for term in INVERTED_INDEX:
+    #         if term == 
+    #         for docs in term["docs"]:
+    #             if docs[0] == doc:
+    #                 norm_factor = docs[2] ** 0.5
+    #     # runningsum = 0
+    #     # for term, position in value.items():
+    #     #     runningsum += position ** 2
+    #     # norm_factor = runningsum ** 0.5 # TODO: consider pulling norm_factor from INVERTED_INDEX. will need to add checks for equality for doc_id equality
+    #     for term, position in value.items():
+    #         value[term] = position/norm_factor
+
+
+    # docs is of the form:
+    # {doc_id: {tk: idf*tf_ik}}
     for doc, value in docs.items():
-        runningsum = 0
-        for term, position in value:
-            runningsum += position ** 2
-        norm_factor = runningsum ** 0.5 # TODO: consider pulling norm_factor from INVERTED_INDEX. will need to add checks for equality for doc_id equality
-        for term, position in value:
+        for term, position in value.items():
+            # Getting the required Normalization factor for the specific document for the specific term
+            for i in INVERTED_INDEX[term]["docs"]:
+                if i[0] == doc:
+                    norm_factor = i[2]
+                    break
+                    # norm_factor = INVERTED_INDEX[term]["docs"][i][2]
             value[term] = position/norm_factor
     
     #DONE
     # docs is of the form:
     # {doc_id: {tk: normalized_position}}
 
-    
-    
+    # has a key as doc_id and value as the sim_score
+    # sim_scores= {}
+
+    # Finding dot products (sim scores for each doc)
+    for doc, value in docs.items(): # Getting one doc out of all the docs
+        sim_score = 0
+        for term_d, position_d in value.items(): # Getting one term from a specific doc
+            for term_q, position_q in query_terms.items(): # getting one term from the query
+                if term_d == term_q: # if they match
+                    sim_score += position_d * position_q # multiply them
+        results[doc] = weight * PAGERANK.get(doc, 0.0) + (1 - weight) * sim_score
 
 
-        
-        
+    # DONE
+    # results has the key as the doc_id and the value as the score
 
-             
-    
-        docs[doc]= 
+    # Didn't realize yall already did this part.
+    # hits = []
+
+    # sorted_results = dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
+
+    # for docid, score in results.items():
+
+    # context = {
+
+    # }
+
+
+
 
     # tf-idf similarity score
     # cossim = q dot product documenti

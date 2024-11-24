@@ -61,6 +61,7 @@ if __name__ == "__main__":
 
 
 # Code I wrote to be consistent with the reduce template from madoop.
+# I haven't checked if this code is good.
 
 # #!/usr/bin/env python3
 # """

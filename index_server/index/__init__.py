@@ -11,7 +11,9 @@ app = Flask(__name__)
 # else:
 #     app.config.update(test_config)
 
-INDEX_PATH = os.getenv("INDEX_PATH", "inverted_index/inverted_index_1.txt")
+# TODO: I changed this from "inverted_index/inverted_index_1.txt" to "inverted_index_1.txt" 
+# cause we were failing the very first assert statement on every test
+INDEX_PATH = os.getenv("INDEX_PATH", "inverted_index_1.txt")
 app.config["INDEX_PATH"] = INDEX_PATH
 
 index.api.load_index()

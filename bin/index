@@ -1,18 +1,26 @@
 #!/bin/bash
 #
-#
+# Control script for starting, stopping and managing index servers
 # Andrew DeOrio <awdeorio@umich.edu>
 
+# Configuration variables
 LOG_FILE="var/log/index.log"
 FLASK_CMD="flask --app index run --host 0.0.0.0"
 PORTS=(9000 9001 9002)
 INDEX_PATHS=("inverted_index_0.txt" "inverted_index_1.txt" "inverted_index_2.txt")
 
-
 start() {
+    # Check if servers are already running
+    NPROCS=$(pgrep -f "flask --app index run --host 0.0.0.0 --port 900[0-2]" | wc -l)
+    if [ "$NPROCS" -gt 0 ]; then
+        echo "Error: index server is already running"
+        exit 1
+    fi
+
     echo "starting index server ..."
     mkdir -p var/log
     rm -f "$LOG_FILE"
+    
     for i in "${!PORTS[@]}"; do
         INDEX_PATH="${INDEX_PATHS[$i]}"
         PORT="${PORTS[$i]}"
@@ -34,23 +42,23 @@ restart() {
     start
 }
 
-
 status() {
     set +o pipefail
     NPROCS=$(pgrep -f "flask --app index run --host 0.0.0.0 --port 900[0-2]" | wc -l)
     set -o pipefail
     if [ "$NPROCS" -eq 3 ]; then
-    echo "index server running"
-    exit
+        echo "index server running"
+        exit 0
     elif [ "$NPROCS" -eq 0 ]; then
-    echo "index server stopped"
-    exit 1
+        echo "index server stopped"
+        exit 1
     else
-    echo "index server error: found ${NPROCS} processes, expected 3"
-    exit 2
+        echo "index server error: found ${NPROCS} processes, expected 3"
+        exit 2
     fi
 }
 
+# Main command processing
 case "$1" in
     start)
         start

@@ -52,13 +52,18 @@ madoop \
 
 
 #idk if we need this bottom part mitul??? but we have it here lol
+# TODO need to change this bc the thing doesnt actually create it in the other directory 
 # yes. Good job. -Mitul
 # Create directory for index server files
-mkdir -p index_server/index/inverted_index
+
+# mkdir -p index_server/index/inverted_index
+mkdir -p ../index_server/index/inverted_index
+
 
 # Copy output files to index server directory
 for i in {0..2}; do
   if [ -f "output3/part-0000${i}" ]; then
-    cp "output3/part-0000${i}" "index_server/index/inverted_index/inverted_index_${i}.txt"
+    # cp "output3/part-0000${i}" "index_server/index/inverted_index/inverted_index_${i}.txt"
+    cp "output/part-0000${i}" ${../index_server/index/inverted_index}
   fi
 done

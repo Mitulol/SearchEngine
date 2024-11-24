@@ -28,10 +28,16 @@ def load_index():
     # TODO: need to modify this to be valid for relative paths, hardcode a base app directory and then 
     # add then concatenate the relative path to it.
     index_path = os.getenv("INDEX_PATH", "index/inverted_index/inverted_index_1.txt")
+    if index_path != "index/inverted_index/inverted_index_1.txt":
+        index_path = f"index/inverted_index/{index_path}"
+
     if os.path.exists(index_path):
         with open(index_path, "r") as f:
             for line in f:
                 term, idf, *docs = line.strip().split()
                 idf = float(idf)
-                docs = [(int(doc.split()[0]), int(doc.split()[1]), float(doc.split()[2])) for doc in docs]
+                docs = [
+                    (int(doc.split()[0]), int(doc.split()[1]), float(doc.split()[2])) 
+                    for doc in docs
+                ]
                 INVERTED_INDEX[term] = {"idf": idf, "docs": docs}

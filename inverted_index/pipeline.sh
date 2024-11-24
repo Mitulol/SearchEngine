@@ -12,7 +12,7 @@ set -x
 
 # Remove output directories
 rm -rf output output[0-9]
-rm -rf index_server/index/inverted_index
+rm -rf ../index_server/index/inverted_index
 
 # TODO: should we remove the output files before submitting the program?
 # They do that in the lab example.
@@ -64,6 +64,6 @@ mkdir -p ../index_server/index/inverted_index
 for i in {0..2}; do
   if [ -f "output3/part-0000${i}" ]; then
     # cp "output3/part-0000${i}" "index_server/index/inverted_index/inverted_index_${i}.txt"
-    cp "output/part-0000${i}" ${../index_server/index/inverted_index}
+    cp "output3/part-0000${i}" ../index_server/index/inverted_index/inverted_index_${i}.txt
   fi
 done

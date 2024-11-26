@@ -1,0 +1,70 @@
+#!/bin/bash
+
+#!/bin/bash
+
+# Configuration
+PORT=8000
+LOG_FILE="var/log/search.log"
+DB_FILE="var/search.sqlite3"
+
+start() {
+    # Check if server is already running
+    if pgrep -f "flask --app search run --host 0.0.0.0 --port ${PORT}" > /dev/null; then
+        echo "Error: search server is already running"
+        exit 1
+    fi
+
+    # Check if database exists
+    if [ ! -f "$DB_FILE" ]; then
+        echo "Error: can't find search database $DB_FILE"
+        echo "Try: ./bin/searchdb"
+        exit 1
+    fi
+
+    # Check if index servers are running
+    if ! ./bin/index status > /dev/null 2>&1; then
+        echo "Error: index server is not running"
+        echo "Try ./bin/index start"
+        exit 1
+    fi
+
+    echo "starting search server ..."
+    mkdir -p var/log
+    rm -f "$LOG_FILE"
+    flask --app search run --host 0.0.0.0 --port ${PORT} &> "$LOG_FILE" &
+}
+
+stop() {
+    echo "stopping search server ..."
+    pkill -f "flask --app search run --host 0.0.0.0 --port ${PORT}" || true
+}
+
+status() {
+    if pgrep -f "flask --app search run --host 0.0.0.0 --port ${PORT}" > /dev/null; then
+        echo "search server running"
+        exit 0
+    else
+        echo "search server stopped"
+        exit 1
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac

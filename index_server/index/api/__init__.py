@@ -16,11 +16,10 @@ logger.propagate = True
 
 def load_index():
     """Load inverted index, stopwords, and PageRank into memory."""
-    global STOPWORDS, PAGERANK, INVERTED_INDEX
-
+    # global STOPWORDS, PAGERANK, INVERTED_INDEX
     # Get the index directory path
     index_dir = Path(__file__).parent.parent
-    logger.debug(f"Index directory: {index_dir}")
+    # logger.debug(f"Index directory: {index_dir}")
 
     # Load stopwords
     # stopwords_path = index_dir / "stopwords.txt"
@@ -35,9 +34,9 @@ def load_index():
     # else:
     #     logger.error(f"Stopwords file not found: {stopwords_path}")
 
-    stopwords_path = index_dir / "stopwords.txt"
-    if os.path.exists(stopwords_path):
-        with open(stopwords_path, "r", encoding='utf-8') as f:
+    # stopwords_path = index_dir / "stopwords.txt"
+    if os.path.exists(index_dir / "stopwords.txt"):
+        with open(index_dir / "stopwords.txt", "r", encoding='utf-8') as f:
             # Properly handle each line, stripping whitespace
             # STOPWORDS = set(f.read().splitlines())
             # STOPWORDS = set(line.strip() for line in f if line.strip())
@@ -54,9 +53,9 @@ def load_index():
     # PAGERANK = {int(line.split(",")[0]): float(line.split(",")[1].strip())
     #                 for line in f}
 
-    pagerank_path = index_dir / "pagerank.out"
-    if os.path.exists(pagerank_path):
-        with open(pagerank_path, "r", encoding='utf-8') as f:
+    # pagerank_path = index_dir / "pagerank.out"
+    if os.path.exists(index_dir / "pagerank.out"):
+        with open(index_dir / "pagerank.out", "r", encoding='utf-8') as f:
             # Handle each line properly with error checking
             for line in f:
                 if ',' in line:
@@ -76,8 +75,8 @@ def load_index():
         with open(index_path, "r", encoding='utf-8') as f:
             for line in f:
                 parts = line.strip().split()
-                term = parts[0]
-                idf = float(parts[1])
+                # term = parts[0]
+                # idf = float(parts[1])
                 docs = []
 
                 # Process document data in groups of 3
@@ -87,4 +86,7 @@ def load_index():
                     norm = float(parts[i + 2])
                     docs.append((doc_id, tf, norm))
 
-                INVERTED_INDEX[term] = {"idf": idf, "docs": docs}
+                INVERTED_INDEX[parts[0]] = {
+                    "idf": float(parts[1]),
+                    "docs": docs
+                }

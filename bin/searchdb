@@ -1,0 +1,60 @@
+#!/bin/bash
+
+#get_summary was given to us
+def get_summary(soup):
+    summary = ""
+    p_elts = soup.find_all("p", class_=False)
+    for p in p_elts:
+        p = p.text
+        # If the body isn't empty and longer than 50 characters (arbitrary)
+        if p.strip() and len(p) > 50:
+            # Limit summary to 250 characters (including truncation)
+            summary = p.strip()[0:247]
+
+            # Escape single quotes for SQL and replace newlines to format query string
+            summary = summary.replace("\n", " ").replace("'", "''")
+
+            # Truncate endings
+            summary = summary + "..."
+            break
+
+    return summary
+
+def main():
+    """Build database."""
+
+    pathlib.Path("var").mkdir(exist_ok=True)
+    db_path = "var/search.sqlite3"
+
+    if os.path.exists(db_path):
+        os.remove(db_path)
+
+
+    db = sqlite3.connect(db_path)
+    db.execute("PRAGMA foreign_keys = ON")
+    
+    # Create table
+    db.execute("""
+        CREATE TABLE documents(
+            docid INTEGER PRIMARY KEY,
+            title VARCHAR(150) NOT NULL,
+            summary VARCHAR(250),
+            url VARCHAR(150) NOT NULL
+        )
+    """)
+
+    crawl_dir = 
+
+
+
+
+
+    #stuff goes here
+
+    #and here
+
+    db.commit()
+    db.close()
+
+if __name__ == "__main__":
+    main()

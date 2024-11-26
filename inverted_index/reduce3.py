@@ -58,14 +58,10 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-
 # Code I wrote to be consistent with the reduce template from madoop.
 # I haven't checked if this code is good.
 
-
-
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # """
 # Reduce 3: Create final inverted index format.
 
@@ -74,7 +70,6 @@ if __name__ == "__main__":
 # import sys
 # from collections import defaultdict
 # import itertools
-
 
 # def calculate_norm_factor(doc_weights):
 #     """Calculate document normalization factor (sum of squared weights)."""
@@ -107,20 +102,14 @@ if __name__ == "__main__":
 #             parts.extend([doc_id, str(tf), str(norm_factor)])
 #         print(" ".join(parts))
 
-
 # def keyfunc(line):
 #     """Return the partition key from a TAB-delimited key-value pair."""
 #     return int(line.partition("\t")[0])
-
 
 # def main():
 #     """Divide sorted lines into groups that share a partition key."""
 #     for partition_key, group in itertools.groupby(sys.stdin, keyfunc):
 #         reduce_one_group(partition_key, group)
 
-
 # if __name__ == "__main__":
 #     main()
-
-
-

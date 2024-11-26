@@ -2,8 +2,10 @@
 """Map 0: Count documents in collection."""
 import sys
 
-# TODO: Include a newline at the end of every line of map output, and every line of reduce output.
-# Does this mean we should add an extra \n? Python adds a newline character by default, so no need for another right?
+# DO: Include a newline at the end of every line of map output,
+# and every line of reduce output.
+# Does this mean we should add an extra \n?
+# Python adds a newline character by default, so no need for another right?
 
 
 def main():

@@ -18,7 +18,9 @@ start() {
     fi
 
     echo "starting index server ..."
+    echo "+ mkdir -p var/log"
     mkdir -p var/log
+    echo "+ rm -f $LOG_FILE"
     rm -f "$LOG_FILE"
     
     for i in "${!PORTS[@]}"; do

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # Configuration
 PORT=8000
 LOG_FILE="var/log/search.log"

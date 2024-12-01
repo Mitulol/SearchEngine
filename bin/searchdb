@@ -1,60 +1,69 @@
-#!/bin/bash
+#!/usr/bin/env python3
+"""Build search database."""
+import os
+import sys
 
-#get_summary was given to us
+# Add the search_server directory to Python path
+sys.path.insert(0, "search_server")
+
+from bs4 import BeautifulSoup
+import flask
+from search import model
+
+
 def get_summary(soup):
+    """Extract summary from BeautifulSoup document."""
     summary = ""
     p_elts = soup.find_all("p", class_=False)
     for p in p_elts:
         p = p.text
-        # If the body isn't empty and longer than 50 characters (arbitrary)
+        # If the body isn't empty and longer than 50 characters
         if p.strip() and len(p) > 50:
             # Limit summary to 250 characters (including truncation)
             summary = p.strip()[0:247]
-
-            # Escape single quotes for SQL and replace newlines to format query string
+            # Escape single quotes for SQL and replace newlines
             summary = summary.replace("\n", " ").replace("'", "''")
-
             # Truncate endings
             summary = summary + "..."
             break
-
     return summary
 
+
 def main():
-    """Build database."""
+    """Build search database."""
+    app = flask.Flask(__name__)
+    app.config["DATABASE_FILENAME"] = "var/search.sqlite3"
 
-    pathlib.Path("var").mkdir(exist_ok=True)
-    db_path = "var/search.sqlite3"
-
-    if os.path.exists(db_path):
-        os.remove(db_path)
-
-
-    db = sqlite3.connect(db_path)
-    db.execute("PRAGMA foreign_keys = ON")
+    # Create database
+    if not os.path.exists("var"):
+        os.makedirs("var")
     
-    # Create table
-    db.execute("""
-        CREATE TABLE documents(
-            docid INTEGER PRIMARY KEY,
-            title VARCHAR(150) NOT NULL,
-            summary VARCHAR(250),
-            url VARCHAR(150) NOT NULL
-        )
-    """)
+    with app.app_context():
+        model.create_db()
+        db = model.get_db()
+        
+        # Process all documents
+        crawl_dir = "inverted_index/crawl"
+        for filename in os.listdir(crawl_dir):
+            with open(os.path.join(crawl_dir, filename), encoding='utf-8') as file:
+                soup = BeautifulSoup(file, "html.parser")
+                
+                # Extract document info
+                docid = int(soup.find("meta", attrs={"eecs485_docid": True}).get("eecs485_docid"))
+                url = soup.find("meta", attrs={"eecs485_url": True}).get("eecs485_url")
+                title = soup.find("title").text.replace(" - Wikipedia", "")
+                summary = get_summary(soup)
 
-    crawl_dir = 
+                # Insert into database
+                db.execute(
+                    "INSERT OR REPLACE INTO documents (docid, title, summary, url) "
+                    "VALUES (?, ?, ?, ?)",
+                    (docid, title, summary, url)
+                )
 
+        db.commit()
+        print("Created var/search.sqlite3")
 
-
-
-
-    #stuff goes here
-
-    #and here
-
-    db.commit()
-    db.close()
 
 if __name__ == "__main__":
     main()

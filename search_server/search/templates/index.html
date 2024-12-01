@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ask485</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+<body>
+    <div class="feed">
+        <div class="ask485">ask485</div>
+        
+        <form action="/" method="GET" class="search_bar">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search"/>
+            <div class="pagerank_weight">PageRank Weight</div>
+            <input type="range" name="w" min="0" max="1" step="0.01" value="{{ weight }}"/>
+            <input type="submit" value="Search"/>
+        </form>
+
+        <div class="docs">
+            {% if documents %}
+                {% for doc in documents %}
+                    <div class="doc">
+                        <div class="doc_title">{{ doc.title }}</div>
+                        <a class="doc_url" href="{{ doc.url }}">{{ doc.url }}</a>
+                        <div class="doc_summary">
+                            {% if doc.summary %}
+                                {{ doc.summary }}
+                            {% else %}
+                                No summary available
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% elif query %}
+                <div class="no_results">No search results found!</div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,14 +1,68 @@
 # **Search Engine Project (EECS 485 - Project 5)**
 
 ## **Introduction**
+This project implements a **scalable search engine** using **MapReduce, TF-IDF scoring, and PageRank ranking**. It processes a large dataset of web pages to construct an **inverted index**, allowing for efficient keyword-based search queries. The system consists of:
 
-This project implements a scalable search engine that processes web pages, constructs an inverted index using MapReduce, and serves search queries via a web interface.
+- **Inverted Index Construction (MapReduce)**: Generates an index of words and their occurrences in documents.
+- **Index Server**: Handles search queries by retrieving relevant documents.
+- **Search Server**: Provides a web-based interface for querying the index.
 
-### **Project Components:**
+## **How It Works**
 
-1. **Inverted Index Construction:** Uses MapReduce to generate an index of web pages.
-2. **Index Server:** REST API that handles search queries and returns ranked results.
-3. **Search Server:** A web interface for querying the search engine and displaying results.
+### **1. Inverted Index Construction (MapReduce)**
+
+The search engine constructs an **inverted index** using MapReduce to process large-scale web page data efficiently. The steps are:
+
+- **Job 0: Document Count**: Computes the total number of documents in the dataset.
+- **Job 1: Parsing**: Extracts words from web pages and removes stopwords.
+- **Job 2: Term Frequency (TF) Calculation**: Computes how often each term appears in a document.
+- **Job 3: Inverted Index Construction**: Aggregates the results and partitions the index into multiple files for efficient lookup.
+
+The index is split into **three segments** (`inverted_index_0.txt`, `inverted_index_1.txt`, `inverted_index_2.txt`). Each Index Server instance only loads one segment based on `INDEX_PATH`.
+
+### **2. TF-IDF Calculation**
+
+Each word’s importance is computed using **Term Frequency-Inverse Document Frequency (TF-IDF)**:
+
+- **Term Frequency (TF)**:
+
+  \(TF(t, d) = \frac{f(t, d)}{\sum f(w, d)}\)
+
+  Example:
+  Suppose "Michigan" appears 5 times in a document with 100 words.
+  - TF("Michigan") = 5 / 100 = 0.05
+  - If "Michigan" appears in 50 out of 10,000 documents:
+    IDF("Michigan") = log(10,000 / 50) ≈ 2.3
+  - TF-IDF("Michigan") = 0.05 \* 2.3 ≈ 0.115
+
+### **3. PageRank Computation**
+
+PageRank is used to rank documents based on their importance in the web graph. The iterative formula is:
+
+\(PR(A) = \frac{1 - d}{N} + d \sum_{B \in M(A)} \frac{PR(B)}{L(B)}\)
+
+Ranking is computed as:
+
+$$
+Score(q, d, w) = w \times PR(d) + (1 - w) \times \cosSim(q, d)
+$$
+
+Where `w` is a tunable parameter (0 ≤ w ≤ 1).
+
+- `w=0`: Ranking is purely TF-IDF-based.
+- `w=1`: Ranking is purely PageRank-based.
+
+### **4. Index Server**
+
+- Queries all **Index Servers in parallel** and merges results using `heapq.merge()`.
+- Computes relevance using **TF-IDF and PageRank**.
+- Returns ranked JSON results.
+
+### **5. Search Server**
+
+- Web UI for user queries.
+- Fetches top results from Index Server.
+- Displays relevant documents.
 
 ---
 
@@ -148,62 +202,6 @@ pydocstyle index_server search_server inverted_index
 │   ├── search.sqlite3  # Search database
 ├── requirements.txt    # Dependencies
 ```
-
----
-
-## **How It Works**
-
-### **1. Inverted Index Construction (MapReduce)**
-
-The search engine constructs an **inverted index** using MapReduce to process large-scale web page data efficiently. The steps are:
-
-- **Job 0: Document Count**: Computes the total number of documents in the dataset.
-- **Job 1: Parsing**: Extracts words from web pages and removes stopwords.
-- **Job 2: Term Frequency (TF) Calculation**: Computes how often each term appears in a document.
-- **Job 3: Inverted Index Construction**: Aggregates the results and partitions the index into multiple files for efficient lookup.
-
-The index is split into **three segments** (`inverted_index_0.txt`, `inverted_index_1.txt`, `inverted_index_2.txt`). Each Index Server instance only loads one segment based on `INDEX_PATH`.
-
-### **2. TF-IDF Calculation**
-
-Each word’s importance is computed using **Term Frequency-Inverse Document Frequency (TF-IDF)**:
-
-- **Term Frequency (TF)**:
-
-  \(TF(t, d) = \frac{f(t, d)}{\sum f(w, d)}\)
-
-  Example:
-  Suppose "Michigan" appears 5 times in a document with 100 words.
-  - TF("Michigan") = 5 / 100 = 0.05
-  - If "Michigan" appears in 50 out of 10,000 documents:
-    IDF("Michigan") = log(10,000 / 50) ≈ 2.3
-  - TF-IDF("Michigan") = 0.05 * 2.3 ≈ 0.115
-
-### **3. PageRank Computation**
-
-PageRank is used to rank documents based on their importance in the web graph. The iterative formula is:
-
-\(PR(A) = \frac{1 - d}{N} + d \sum_{B \in M(A)} \frac{PR(B)}{L(B)}\)
-
-Ranking is computed as:
-\[
-Score(q, d, w) = w \times PR(d) + (1 - w) \times \cosSim(q, d)
-\]
-Where `w` is a tunable parameter (0 ≤ w ≤ 1). 
-- `w=0`: Ranking is purely TF-IDF-based.
-- `w=1`: Ranking is purely PageRank-based.
-
-### **4. Index Server**
-
-- Queries all **Index Servers in parallel** and merges results using `heapq.merge()`.
-- Computes relevance using **TF-IDF and PageRank**.
-- Returns ranked JSON results.
-
-### **5. Search Server**
-
-- Web UI for user queries.
-- Fetches top results from Index Server.
-- Displays relevant documents.
 
 ---
 

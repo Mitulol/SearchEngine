@@ -26,42 +26,40 @@ Each word’s importance is computed using **Term Frequency-Inverse Document Fre
 
 - **Term Frequency (TF)**:
 
-  \(TF(t, d) = \frac{f(t, d)}{\sum f(w, d)}\)
+  `TF(t, d) = f(t, d) / Σ f(w, d)`
 
 - **Inverse Document Frequency (IDF)**:
 
-  \(IDF(t) = \log \frac{N}{df(t)}\)
+  `IDF(t) = log(N / df(t))`
 
   where:
-  - \(f(t, d)\) is the number of times term \(t\) appears in document \(d\).
-  - \(df(t)\) is the number of documents containing \(t\).
-  - \(N\) is the total number of documents.
+  - `f(t, d)` is the number of times term `t` appears in document `d`.
+  - `df(t)` is the number of documents containing `t`.
+  - `N` is the total number of documents.
 
   **Example Calculation:**
   Suppose "Michigan" appears 5 times in a document with 100 words.
-  - \(TF(\text{Michigan}) = \frac{5}{100} = 0.05\)
+  - `TF(Michigan) = 5 / 100 = 0.05`
   - If "Michigan" appears in 50 out of 10,000 documents:
-    \(IDF(\text{Michigan}) = \log \frac{10,000}{50} \approx 2.3\)
-  - \(TF-IDF(\text{Michigan}) = 0.05 \times 2.3 \approx 0.115\)
+    `IDF(Michigan) = log(10,000 / 50) ≈ 2.3`
+  - `TF-IDF(Michigan) = 0.05 * 2.3 ≈ 0.115`
 
 ### **3. PageRank Computation**
 
 PageRank is used to rank documents based on their importance in the web graph. The iterative formula is:
 
-\(PR(A) = \frac{1 - d}{N} + d \sum_{B \in M(A)} \frac{PR(B)}{L(B)}\)
+`PR(A) = (1 - d) / N + d * Σ (PR(B) / L(B)) for B ∈ M(A)`
 
 where:
-- \(PR(A)\) is the PageRank of document \(A\).
-- \(d\) is the damping factor (commonly 0.85).
-- \(N\) is the total number of documents.
-- \(M(A)\) is the set of documents linking to \(A\).
-- \(L(B)\) is the number of outbound links in document \(B\).
+- `PR(A)` is the PageRank of document `A`.
+- `d` is the damping factor (commonly 0.85).
+- `N` is the total number of documents.
+- `M(A)` is the set of documents linking to `A`.
+- `L(B)` is the number of outbound links in document `B`.
 
 Ranking is computed as:
 
-$$
-Score(q, d, w) = w \times PR(d) + (1 - w) \times \cosSim(q, d)
-$$
+`Score(q, d, w) = w * PR(d) + (1 - w) * cosSim(q, d)`
 
 Where `w` is a tunable parameter (0 ≤ w ≤ 1).
 

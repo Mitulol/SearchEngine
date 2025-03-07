@@ -2,7 +2,6 @@
 """
 Reduce 2: Calculate IDF and prepare document info.
 
-https://github.com/eecs485staff/madoop/blob/main/README_Hadoop_Streaming.md
 """
 import sys
 import math

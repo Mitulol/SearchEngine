@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Control script for starting, stopping and managing index servers
-# Andrew DeOrio <awdeorio@umich.edu>
 
 # Configuration variables
 LOG_FILE="var/log/index.log"

@@ -28,18 +28,34 @@ Each word’s importance is computed using **Term Frequency-Inverse Document Fre
 
   \(TF(t, d) = \frac{f(t, d)}{\sum f(w, d)}\)
 
-  Example:
+- **Inverse Document Frequency (IDF)**:
+
+  \(IDF(t) = \log \frac{N}{df(t)}\)
+
+  where:
+  - \(f(t, d)\) is the number of times term \(t\) appears in document \(d\).
+  - \(df(t)\) is the number of documents containing \(t\).
+  - \(N\) is the total number of documents.
+
+  **Example Calculation:**
   Suppose "Michigan" appears 5 times in a document with 100 words.
-  - TF("Michigan") = 5 / 100 = 0.05
+  - \(TF(\text{Michigan}) = \frac{5}{100} = 0.05\)
   - If "Michigan" appears in 50 out of 10,000 documents:
-    IDF("Michigan") = log(10,000 / 50) ≈ 2.3
-  - TF-IDF("Michigan") = 0.05 \* 2.3 ≈ 0.115
+    \(IDF(\text{Michigan}) = \log \frac{10,000}{50} \approx 2.3\)
+  - \(TF-IDF(\text{Michigan}) = 0.05 \times 2.3 \approx 0.115\)
 
 ### **3. PageRank Computation**
 
 PageRank is used to rank documents based on their importance in the web graph. The iterative formula is:
 
 \(PR(A) = \frac{1 - d}{N} + d \sum_{B \in M(A)} \frac{PR(B)}{L(B)}\)
+
+where:
+- \(PR(A)\) is the PageRank of document \(A\).
+- \(d\) is the damping factor (commonly 0.85).
+- \(N\) is the total number of documents.
+- \(M(A)\) is the set of documents linking to \(A\).
+- \(L(B)\) is the number of outbound links in document \(B\).
 
 Ranking is computed as:
 
@@ -175,51 +191,14 @@ pydocstyle index_server search_server inverted_index
 ## **Project Structure**
 
 ```
-.
-├── bin/                 # Scripts for managing servers
-├── inverted_index/      # MapReduce index construction
-│   ├── crawl/          # Web page dataset
-│   ├── output/         # Generated inverted index files
-│   ├── pipeline.sh     # Shell script for MapReduce
-│   ├── stopwords.txt   # Common words to ignore
-│   ├── pagerank.out    # Precomputed PageRank values
-├── index_server/       # API for index-based search
-│   ├── index/
-│   │   ├── inverted_index/
-│   │   ├── pagerank.out
-│   │   ├── stopwords.txt
-│   ├── api/
-│   │   ├── main.py
-├── search_server/      # Web-based search engine
-│   ├── search/
-│   │   ├── templates/index.html  # Search UI
-│   │   ├── static/css/style.css  # Styles
-│   │   ├── config.py  # API configurations
-│   │   ├── model.py   # Database functions
-│   │   ├── views/__init__.py  # Flask views
-├── tests/              # Unit tests
-├── var/                # Logs and database
-│   ├── search.sqlite3  # Search database
-├── requirements.txt    # Dependencies
+<unchanged project structure>
 ```
 
 ---
 
 ## **Debugging & Troubleshooting**
 
-- Querying Individual Index Servers:
-  ```bash
-  http "localhost:9000/api/v1/hits/?q=machine+learning&w=0.7"
-  ```
-- Testing Index Server API:
-  ```bash
-  pytest -v tests/test_index_server_public.py
-  ```
-- Verifying Correct TF-IDF and PageRank Values:
-  ```bash
-  grep "^machine " index_server/index/inverted_index/inverted_index_*.txt
-  grep "12345678," index_server/index/pagerank.out
-  ```
+<unchanged debugging section>
 
 ---
 

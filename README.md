@@ -189,14 +189,51 @@ pydocstyle index_server search_server inverted_index
 ## **Project Structure**
 
 ```
-<unchanged project structure>
+.
+├── bin/                 # Scripts for managing servers
+├── inverted_index/      # MapReduce index construction
+│   ├── crawl/          # Web page dataset
+│   ├── output/         # Generated inverted index files
+│   ├── pipeline.sh     # Shell script for MapReduce
+│   ├── stopwords.txt   # Common words to ignore
+│   ├── pagerank.out    # Precomputed PageRank values
+├── index_server/       # API for index-based search
+│   ├── index/
+│   │   ├── inverted_index/
+│   │   ├── pagerank.out
+│   │   ├── stopwords.txt
+│   ├── api/
+│   │   ├── main.py
+├── search_server/      # Web-based search engine
+│   ├── search/
+│   │   ├── templates/index.html  # Search UI
+│   │   ├── static/css/style.css  # Styles
+│   │   ├── config.py  # API configurations
+│   │   ├── model.py   # Database functions
+│   │   ├── views/__init__.py  # Flask views
+├── tests/              # Unit tests
+├── var/                # Logs and database
+│   ├── search.sqlite3  # Search database
+├── requirements.txt    # Dependencies
 ```
 
 ---
 
 ## **Debugging & Troubleshooting**
 
-<unchanged debugging section>
+- Querying Individual Index Servers:
+  ```bash
+  http "localhost:9000/api/v1/hits/?q=machine+learning&w=0.7"
+  ```
+- Testing Index Server API:
+  ```bash
+  pytest -v tests/test_index_server_public.py
+  ```
+- Verifying Correct TF-IDF and PageRank Values:
+  ```bash
+  grep "^machine " index_server/index/inverted_index/inverted_index_*.txt
+  grep "12345678," index_server/index/pagerank.out
+  ```
 
 ---
 

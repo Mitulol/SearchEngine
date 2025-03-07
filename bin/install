@@ -1,8 +1,6 @@
 #!/bin/bash
 #
 # mapreduce
-#
-# Andrew DeOrio <awdeorio@umich.edu>
 
 
 set -Eeuo pipefail

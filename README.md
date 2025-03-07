@@ -1,4 +1,4 @@
-# **Search Engine Project (EECS 485 - Project 5)**
+# **Search Engine Project**
 
 ## **Introduction**
 This project implements a **scalable search engine** using **MapReduce, TF-IDF scoring, and PageRank ranking**. It processes a large dataset of web pages to construct an **inverted index**, allowing for efficient keyword-based search queries. The system consists of:
@@ -236,10 +236,4 @@ pydocstyle index_server search_server inverted_index
   ```
 
 ---
-
-## **Authors & Acknowledgments**
-
-- **Developed for EECS 485 (University of Michigan).**
-- **Instructors: Andrew DeOrio, Melina O’Dell, Maya Baveja.**
-- **Data: Wikipedia subset on Michigan and Technology.**
 

@@ -1,239 +1,180 @@
-# **Search Engine Project**
+# Search Engine Project
 
-## **Introduction**
-This project implements a **scalable search engine** using **MapReduce, TF-IDF scoring, and PageRank ranking**. It processes a large dataset of web pages to construct an **inverted index**, allowing for efficient keyword-based search queries. The system consists of:
+## Overview
 
-- **Inverted Index Construction (MapReduce)**: Generates an index of words and their occurrences in documents.
-- **Index Server**: Handles search queries by retrieving relevant documents.
-- **Search Server**: Provides a web-based interface for querying the index.
+This project implements a scalable search engine using **MapReduce**, **TF-IDF scoring**, and **PageRank ranking**. It processes a large dataset of web pages to construct an inverted index, allowing for efficient keyword-based search queries. The system consists of:
 
-## **How It Works**
+- **Inverted Index Construction (MapReduce)** — generates an index of words and their occurrences across documents.
+- **Index Server** — handles search queries by retrieving relevant documents from the index.
+- **Search Server** — provides a web-based interface for querying the index.
 
-### **1. Inverted Index Construction (MapReduce)**
+## How It Works
 
-The search engine constructs an **inverted index** using MapReduce to process large-scale web page data efficiently. The steps are:
+### 1. Inverted Index Construction (MapReduce)
 
-- **Job 0: Document Count**: Computes the total number of documents in the dataset.
-- **Job 1: Parsing**: Extracts words from web pages and removes stopwords.
-- **Job 2: Term Frequency (TF) Calculation**: Computes how often each term appears in a document.
-- **Job 3: Inverted Index Construction**: Aggregates the results and partitions the index into multiple files for efficient lookup.
+The search engine constructs an inverted index using a MapReduce pipeline to process large-scale web page data efficiently:
 
-The index is split into **three segments** (`inverted_index_0.txt`, `inverted_index_1.txt`, `inverted_index_2.txt`). Each Index Server instance only loads one segment based on `INDEX_PATH`.
+- **Job 0: Document Count** — computes the total number of documents in the dataset.
+- **Job 1: Parsing** — extracts words from web pages and removes stopwords.
+- **Job 2: Term Frequency (TF) Calculation** — computes how often each term appears in a document.
+- **Job 3: Inverted Index Construction** — aggregates the results and partitions the index into multiple files for efficient lookup.
 
-### **2. TF-IDF Calculation**
+The index is split into three segments (`inverted_index_0.txt`, `inverted_index_1.txt`, `inverted_index_2.txt`). Each Index Server instance loads only one segment, based on `INDEX_PATH`.
 
-Each word’s importance is computed using **Term Frequency-Inverse Document Frequency (TF-IDF)**:
+### 2. TF-IDF Calculation
 
-- **Term Frequency (TF)**:
+Each word's importance is computed using Term Frequency-Inverse Document Frequency (TF-IDF):
 
-  `TF(t, d) = f(t, d) / Σ f(w, d)`
+**Term Frequency (TF):**
 
-- **Inverse Document Frequency (IDF)**:
+`TF(t, d) = f(t, d) / Σ f(w, d)`
 
-  `IDF(t) = log(N / df(t))`
+**Inverse Document Frequency (IDF):**
 
-  where:
-  - `f(t, d)` is the number of times term `t` appears in document `d`.
-  - `df(t)` is the number of documents containing `t`.
-  - `N` is the total number of documents.
+`IDF(t) = log(N / df(t))`
 
-  **Example Calculation:**
-  Suppose "Michigan" appears 5 times in a document with 100 words.
-  - `TF(Michigan) = 5 / 100 = 0.05`
-  - If "Michigan" appears in 50 out of 10,000 documents:
-    `IDF(Michigan) = log(10,000 / 50) ≈ 2.3`
-  - `TF-IDF(Michigan) = 0.05 * 2.3 ≈ 0.115`
+where `f(t, d)` is the number of times term `t` appears in document `d`, `df(t)` is the number of documents containing `t`, and `N` is the total number of documents.
 
-### **3. PageRank Computation**
+**Example:** suppose "algorithm" appears 5 times in a document with 100 words:
+- `TF(algorithm) = 5 / 100 = 0.05`
+- If "algorithm" appears in 50 out of 10,000 documents: `IDF(algorithm) = log(10,000 / 50) ≈ 2.3`
+- `TF-IDF(algorithm) = 0.05 * 2.3 ≈ 0.115`
 
-PageRank is used to rank documents based on their importance in the web graph. The iterative formula is:
+### 3. PageRank Computation
+
+PageRank ranks documents by importance in the web graph, computed with the iterative formula:
 
 `PR(A) = (1 - d) / N + d * Σ (PR(B) / L(B)) for B ∈ M(A)`
 
-where:
-- `PR(A)` is the PageRank of document `A`.
-- `d` is the damping factor (commonly 0.85).
-- `N` is the total number of documents.
-- `M(A)` is the set of documents linking to `A`.
-- `L(B)` is the number of outbound links in document `B`.
+where `d` is the damping factor (commonly 0.85), `N` is the total number of documents, `M(A)` is the set of documents linking to `A`, and `L(B)` is the number of outbound links in document `B`.
 
-Ranking is computed as:
+Final ranking blends the two signals via a tunable weight:
 
 `Score(q, d, w) = w * PR(d) + (1 - w) * cosSim(q, d)`
 
-Where `w` is a tunable parameter (0 ≤ w ≤ 1).
+At `w=0`, ranking is purely TF-IDF-based; at `w=1`, it's purely PageRank-based.
 
-- `w=0`: Ranking is purely TF-IDF-based.
-- `w=1`: Ranking is purely PageRank-based.
+### 4. Index Server
 
-### **4. Index Server**
+Queries all index shards in parallel and merges results with `heapq.merge()`, computing relevance from the blended TF-IDF/PageRank score and returning ranked JSON results.
 
-- Queries all **Index Servers in parallel** and merges results using `heapq.merge()`.
-- Computes relevance using **TF-IDF and PageRank**.
-- Returns ranked JSON results.
+### 5. Search Server
 
-### **5. Search Server**
-
-- Web UI for user queries.
-- Fetches top results from Index Server.
-- Displays relevant documents.
+A Flask-based web UI that fetches ranked results from the Index Server and displays them to the user.
 
 ---
 
-## **Setup Instructions**
+## Setup Instructions
 
-### **1. Clone the Repository**
-
+**1. Clone the repository**
 ```bash
 git clone <repository_url>
-cd p5-search-engine
+cd search-engine
 ```
 
-### **2. Create and Activate a Python Virtual Environment**
-
+**2. Create and activate a Python virtual environment**
 ```bash
 python3 -m venv env
 source env/bin/activate
 ```
 
-### **3. Install Dependencies**
-
+**3. Install dependencies**
 ```bash
 pip install -r requirements.txt
 pip install -e index_server
 pip install -e search_server
 ```
 
-### **4. Extract Crawl Data**
-
+**4. Extract crawl data**
 ```bash
 cd inverted_index
 tar -xvJf crawl.tar.xz
 ```
 
-### **5. Build the Inverted Index**
+**5. Build the inverted index**
 
 Run the MapReduce pipeline:
-
 ```bash
 cd inverted_index
 ./pipeline.sh crawl
 ```
+The pipeline script automatically moves the generated index files to the `index_server` directory — no manual copying needed.
 
-The pipeline script automatically moves the generated index files to the `index_server` directory, so no manual copying is needed.
-
-### **6. Setup the Index Server**
-
-Start the index server:
-
+**6. Start the Index Server**
 ```bash
-./bin/index start
+./bin/index start   # ./bin/index status | ./bin/index stop
 ```
 
-Check status:
-
+**7. Start the Search Server**
 ```bash
-./bin/index status
+./bin/searchdb       # creates the search database
+./bin/search start   # ./bin/search status | ./bin/search stop
 ```
 
-Stop the server:
-
-```bash
-./bin/index stop
-```
-
-### **7. Setup the Search Server**
-
-Create the search database:
-
-```bash
-./bin/searchdb
-```
-
-Start the search server:
-
-```bash
-./bin/search start
-```
-
-Check status:
-
-```bash
-./bin/search status
-```
-
-Stop the server:
-
-```bash
-./bin/search stop
-```
-
-### **8. Running Tests**
-
-Run public tests:
-
+**8. Run tests**
 ```bash
 pytest -v tests/
 ```
 
-Check code style:
-
-```bash
-pylint index_server search_server inverted_index
-pycodestyle index_server search_server inverted_index
-pydocstyle index_server search_server inverted_index
-```
-
 ---
 
-## **Project Structure**
+## Project Structure
 
 ```
 .
 ├── bin/                 # Scripts for managing servers
 ├── inverted_index/      # MapReduce index construction
-│   ├── crawl/          # Web page dataset
-│   ├── output/         # Generated inverted index files
-│   ├── pipeline.sh     # Shell script for MapReduce
-│   ├── stopwords.txt   # Common words to ignore
-│   ├── pagerank.out    # Precomputed PageRank values
-├── index_server/       # API for index-based search
+│   ├── crawl/           # Web page dataset
+│   ├── output/          # Generated inverted index files
+│   ├── pipeline.sh      # Shell script for the MapReduce pipeline
+│   ├── stopwords.txt    # Common words to ignore
+│   └── pagerank.out     # Precomputed PageRank values
+├── index_server/        # API for index-based search
 │   ├── index/
 │   │   ├── inverted_index/
 │   │   ├── pagerank.out
-│   │   ├── stopwords.txt
-│   ├── api/
-│   │   ├── main.py
-├── search_server/      # Web-based search engine
-│   ├── search/
-│   │   ├── templates/index.html  # Search UI
-│   │   ├── static/css/style.css  # Styles
-│   │   ├── config.py  # API configurations
-│   │   ├── model.py   # Database functions
-│   │   ├── views/__init__.py  # Flask views
-├── tests/              # Unit tests
-├── var/                # Logs and database
-│   ├── search.sqlite3  # Search database
-├── requirements.txt    # Dependencies
+│   │   └── stopwords.txt
+│   └── api/
+│       └── main.py
+├── search_server/       # Web-based search interface
+│   └── search/
+│       ├── templates/index.html
+│       ├── static/css/style.css
+│       ├── config.py
+│       ├── model.py
+│       └── views/__init__.py
+├── tests/                # Unit tests
+├── var/                  # Logs and database
+│   └── search.sqlite3
+└── requirements.txt
 ```
 
 ---
 
-## **Debugging & Troubleshooting**
+## Debugging & Troubleshooting
 
-- Querying Individual Index Servers:
-  ```bash
-  http "localhost:9000/api/v1/hits/?q=machine+learning&w=0.7"
-  ```
-- Testing Index Server API:
-  ```bash
-  pytest -v tests/test_index_server_public.py
-  ```
-- Verifying Correct TF-IDF and PageRank Values:
-  ```bash
-  grep "^machine " index_server/index/inverted_index/inverted_index_*.txt
-  grep "12345678," index_server/index/pagerank.out
-  ```
+Querying an individual Index Server directly:
+```bash
+http "localhost:9000/api/v1/hits/?q=machine+learning&w=0.7"
+```
+
+Testing the Index Server API:
+```bash
+pytest -v tests/test_index_server_public.py
+```
+
+Verifying TF-IDF and PageRank values:
+```bash
+grep "^machine " index_server/index/inverted_index/inverted_index_*.txt
+grep "12345678," index_server/index/pagerank.out
+```
 
 ---
 
+## Author
+
+**Mitul Goel** — [GitHub](https://github.com/Mitulol) · [LinkedIn](https://linkedin.com/in/mitul-goel)
+
+B.S.E. Computer Science
+College of Engineering
+University of Michigan
